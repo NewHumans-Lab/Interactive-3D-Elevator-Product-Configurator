@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>AURA Door Configurator Demo</title>
+  <style>
+    :root{--bg:#0a0b0d;--panel:#111319;--panel2:#171a21;--text:#f4f5f7;--muted:#9ea4af;--line:#2a2f39;--accent:#d7b46a;--ok:#9fd7b3}
+    *{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow:hidden}
+    #app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 360px} #stage{position:relative;min-width:0} canvas{display:block;width:100%;height:100%;touch-action:none}
+    .brand{position:absolute;left:24px;top:20px;z-index:5;pointer-events:none}.brand h1{margin:0;font-size:18px;letter-spacing:.22em;font-weight:700}.brand p{margin:7px 0 0;color:var(--muted);font-size:12px}
+    .hint{position:absolute;left:24px;bottom:18px;color:#8b919d;font-size:12px;background:rgba(10,11,13,.55);backdrop-filter:blur(8px);padding:8px 10px;border:1px solid rgba(255,255,255,.06);border-radius:10px}
+    .panel{border-left:1px solid var(--line);background:linear-gradient(180deg,var(--panel),#0f1116);padding:22px;overflow:auto}.section{margin-bottom:22px}.section h3{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:12px;border-radius:12px;font-size:13px;cursor:pointer;transition:.18s ease}button:hover{border-color:#464d59;transform:translateY(-1px)}button.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(215,180,106,.2) inset}.primary{background:#eceff3;color:#101216;border-color:#eceff3;font-weight:700}.material-grid{display:grid;grid-template-columns:1fr;gap:8px}
+    .status{font-size:13px;color:var(--ok);line-height:1.6;background:#0d1712;border:1px solid #1f3a2b;border-radius:12px;padding:12px}.note{font-size:12px;color:var(--muted);line-height:1.55}.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;background:#151820;border:1px solid var(--line);font-size:11px;color:var(--muted);margin-right:6px;margin-bottom:6px}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+    @media(max-width:850px){html,body{overflow:auto}#app{height:auto;min-height:100%;grid-template-columns:1fr;grid-template-rows:66vh auto}.panel{border-left:0;border-top:1px solid var(--line)}}
+  </style>
+</head>
+<body>
+<div id="app">
+  <section id="stage">
+    <div class="brand"><h1>AURA 3D</h1><p>Door Configurator — proof demo</p></div>
+    <div class="hint">Drag to orbit · Pinch / wheel to zoom</div>
+  </section>
+  <aside class="panel">
+    <div class="section"><h3>Door operation</h3><div class="material-grid">
+      <button class="mode active" data-mode="center">Automatic — Center Opening</button>
+      <button class="mode" data-mode="telRight">Automatic — Telescopic Right</button>
+      <button class="mode" data-mode="telLeft">Automatic — Telescopic Left</button>
+    </div></div>
+    <div class="section"><h3>Door finish</h3><div class="material-grid">
+      <button class="mat active" data-mat="hairline">Hairline Stainless Steel</button>
+      <button class="mat" data-mat="mirror">Mirror Stainless Steel</button>
+      <button class="mat" data-mat="champagne">Champagne Stainless Steel</button>
+    </div></div>
+    <div class="section"><h3>Animation</h3><div class="row"><button id="openBtn" class="primary">OPEN</button><button id="closeBtn">CLOSE</button></div></div>
+    <div class="section"><h3>View</h3><div class="row"><button id="frontBtn">Front View</button><button id="interiorBtn">Interior View</button></div></div>
+    <div class="section"><h3>Demo scope</h3><div>
+      <span class="pill"><span class="dot"></span>Three.js / WebGL</span><span class="pill"><span class="dot"></span>PBR materials</span><span class="pill"><span class="dot"></span>Real-time animation</span><span class="pill"><span class="dot"></span>Touch-friendly</span>
+    </div><p class="note">Compact Phase‑1 proof: procedural elevator-door geometry, real-time material switching, open/close motion, orbit/zoom, and reusable motion architecture.</p></div>
+    <div class="status" id="status">READY — Center Opening / Hairline Stainless</div>
+  </aside>
+</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/controls/OrbitControls.js';
+const stage=document.getElementById('stage');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0a0b0d);
+const camera=new THREE.PerspectiveCamera(38,1,.1,100);camera.position.set(0,1.2,7.7);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;renderer.shadowMap.enabled=true;stage.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,1.25,0);controls.minDistance=4.5;controls.maxDistance=12;controls.maxPolarAngle=Math.PI*.62;controls.minPolarAngle=Math.PI*.30;
+scene.add(new THREE.HemisphereLight(0xe9eef8,0x28231a,1.5));
+const key=new THREE.DirectionalLight(0xffffff,3.2);key.position.set(3.5,6,4.5);key.castShadow=true;scene.add(key);
+const rim=new THREE.DirectionalLight(0xd2b27a,2);rim.position.set(-4,2,-3);scene.add(rim);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(14,14),new THREE.MeshStandardMaterial({color:0x111317,roughness:.85,metalness:.05}));ground.rotation.x=-Math.PI/2;ground.position.y=-.02;ground.receiveShadow=true;scene.add(ground);
+const backdrop=new THREE.Mesh(new THREE.PlaneGeometry(12,7),new THREE.MeshStandardMaterial({color:0x0f1115,roughness:.92}));backdrop.position.set(0,3,-1.15);scene.add(backdrop);
+const frameMat=new THREE.MeshStandardMaterial({color:0x252a30,metalness:.75,roughness:.32});const wallMat=new THREE.MeshStandardMaterial({color:0x15181d,metalness:.15,roughness:.72});
+function box(w,h,d,mat,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+box(5.5,.22,.46,frameMat,0,3.92,0);box(.22,3.7,.46,frameMat,-2.64,2,0);box(.22,3.7,.46,frameMat,2.64,2,0);box(6.7,4.3,.35,wallMat,-6,2.15,-.1);box(6.7,4.3,.35,wallMat,6,2.15,-.1);
+const doorGroup=new THREE.Group();scene.add(doorGroup);
+const materials={hairline:new THREE.MeshPhysicalMaterial({color:0xbfc4c9,metalness:1,roughness:.28,clearcoat:.18,clearcoatRoughness:.3}),mirror:new THREE.MeshPhysicalMaterial({color:0xe8edf3,metalness:1,roughness:.055,clearcoat:.85,clearcoatRoughness:.03}),champagne:new THREE.MeshPhysicalMaterial({color:0xc8a768,metalness:1,roughness:.22,clearcoat:.2,clearcoatRoughness:.2})};
+const panelGeo=new THREE.BoxGeometry(1,3.55,.13);let panels=[],mode='center',matName='hairline',progress=0,targetProgress=0;
+function rebuildDoor(){while(doorGroup.children.length)doorGroup.remove(doorGroup.children[0]);panels=[];const mat=materials[matName];if(mode==='center'){for(let i=0;i<2;i++){const p=new THREE.Mesh(panelGeo,mat);p.scale.x=2.46;p.position.set(i===0?-1.23:1.23,2.02,.03);p.castShadow=true;p.userData.closedX=p.position.x;panels.push(p);doorGroup.add(p)}}else{for(let i=0;i<3;i++){const p=new THREE.Mesh(panelGeo,mat);p.scale.x=1.64;p.position.set(-1.64+i*1.64,2.02,.03+i*.008);p.castShadow=true;p.userData.closedX=p.position.x;panels.push(p);doorGroup.add(p)}}applyDoorPose();updateStatus()}
+function applyDoorPose(){const eased=progress*progress*(3-2*progress);if(mode==='center'){const travel=2.05;panels[0].position.x=panels[0].userData.closedX-travel*eased;panels[1].position.x=panels[1].userData.closedX+travel*eased}else if(mode==='telRight'){const base=1.55*eased;panels.forEach((p,i)=>p.position.x=p.userData.closedX+base*(i+1))}else{const base=1.55*eased;panels.forEach((p,i)=>p.position.x=p.userData.closedX-base*(panels.length-i))}}
+function updateStatus(){const ml={center:'Center Opening',telRight:'Telescopic Right',telLeft:'Telescopic Left'}[mode],mt={hairline:'Hairline Stainless',mirror:'Mirror Stainless',champagne:'Champagne Stainless'}[matName],st=targetProgress>.5?'OPENING':'CLOSING';document.getElementById('status').textContent=`${st} / ${ml} / ${mt}`}
+document.querySelectorAll('.mode').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(b=>b.classList.remove('active'));btn.classList.add('active');mode=btn.dataset.mode;progress=0;targetProgress=0;rebuildDoor()}));
+document.querySelectorAll('.mat').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.mat').forEach(b=>b.classList.remove('active'));btn.classList.add('active');matName=btn.dataset.mat;rebuildDoor()}));
+document.getElementById('openBtn').onclick=()=>{targetProgress=1;updateStatus()};document.getElementById('closeBtn').onclick=()=>{targetProgress=0;updateStatus()};
+function setView(pos,target){camera.position.set(...pos);controls.target.set(...target);controls.update()}document.getElementById('frontBtn').onclick=()=>setView([0,1.25,7.7],[0,1.25,0]);document.getElementById('interiorBtn').onclick=()=>setView([0,1.45,-6.2],[0,1.25,0]);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+let last=performance.now();function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;progress+=(targetProgress-progress)*Math.min(1,dt*3.2);if(Math.abs(targetProgress-progress)<.001)progress=targetProgress;applyDoorPose();controls.update();renderer.render(scene,camera)}rebuildDoor();requestAnimationFrame(animate);
+</script>
+</body>
+</html>
