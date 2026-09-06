@@ -3,72 +3,269 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>AURA Door Configurator Demo</title>
+  <meta name="theme-color" content="#0b0d10" />
+  <title>AURA 3D — Elevator Door Configurator Proof</title>
   <style>
-    :root{--bg:#0a0b0d;--panel:#111319;--panel2:#171a21;--text:#f4f5f7;--muted:#9ea4af;--line:#2a2f39;--accent:#d7b46a;--ok:#9fd7b3}
-    *{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow:hidden}
-    #app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 360px} #stage{position:relative;min-width:0} canvas{display:block;width:100%;height:100%;touch-action:none}
-    .brand{position:absolute;left:24px;top:20px;z-index:5;pointer-events:none}.brand h1{margin:0;font-size:18px;letter-spacing:.22em;font-weight:700}.brand p{margin:7px 0 0;color:var(--muted);font-size:12px}
-    .hint{position:absolute;left:24px;bottom:18px;color:#8b919d;font-size:12px;background:rgba(10,11,13,.55);backdrop-filter:blur(8px);padding:8px 10px;border:1px solid rgba(255,255,255,.06);border-radius:10px}
-    .panel{border-left:1px solid var(--line);background:linear-gradient(180deg,var(--panel),#0f1116);padding:22px;overflow:auto}.section{margin-bottom:22px}.section h3{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:12px;border-radius:12px;font-size:13px;cursor:pointer;transition:.18s ease}button:hover{border-color:#464d59;transform:translateY(-1px)}button.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(215,180,106,.2) inset}.primary{background:#eceff3;color:#101216;border-color:#eceff3;font-weight:700}.material-grid{display:grid;grid-template-columns:1fr;gap:8px}
-    .status{font-size:13px;color:var(--ok);line-height:1.6;background:#0d1712;border:1px solid #1f3a2b;border-radius:12px;padding:12px}.note{font-size:12px;color:var(--muted);line-height:1.55}.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;background:#151820;border:1px solid var(--line);font-size:11px;color:var(--muted);margin-right:6px;margin-bottom:6px}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
-    @media(max-width:850px){html,body{overflow:auto}#app{height:auto;min-height:100%;grid-template-columns:1fr;grid-template-rows:66vh auto}.panel{border-left:0;border-top:1px solid var(--line)}}
+    :root{
+      --bg:#090b0e;--panel:#101319;--panel2:#171b22;--line:#2b313b;
+      --text:#f4f6f8;--muted:#98a1ad;--gold:#d9b76d;--green:#82d0a3;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    body{overflow:hidden}
+    #app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 370px}
+    #stage{position:relative;min-width:0;overflow:hidden}
+    canvas{display:block;width:100%;height:100%;touch-action:none}
+    .brand{position:absolute;z-index:5;left:24px;top:20px;pointer-events:none}
+    .brandline{display:flex;align-items:center;gap:10px}
+    .live{font-size:10px;letter-spacing:.15em;color:#b9f3ce;border:1px solid #245737;background:#0e2116;border-radius:999px;padding:5px 8px}
+    .brand h1{margin:0;font-size:18px;letter-spacing:.19em;font-weight:800}
+    .brand p{margin:7px 0 0;color:var(--muted);font-size:12px}
+    .hint{position:absolute;z-index:5;left:24px;bottom:18px;font-size:12px;color:#949ca7;background:rgba(7,9,12,.64);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07);padding:9px 11px;border-radius:10px;pointer-events:none}
+    .panel{border-left:1px solid var(--line);background:linear-gradient(180deg,#12151b,#0e1116);padding:22px;overflow:auto}
+    .section{margin-bottom:22px}.section h3{margin:0 0 10px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.17em}
+    .stack{display:grid;gap:8px}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    button{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:12px;border-radius:11px;font-size:13px;cursor:pointer;transition:.17s ease;text-align:left}
+    button:hover{border-color:#4a5260;transform:translateY(-1px)}button:active{transform:translateY(0)}
+    button.active{border-color:var(--gold);box-shadow:0 0 0 1px rgba(217,183,109,.18) inset}
+    button.action{text-align:center;font-weight:800}.primary{background:#edf0f4;color:#111318;border-color:#edf0f4}.gold{background:#201b12;border-color:#5a4825;color:#f4d89c}
+    .status{border:1px solid #214533;background:#0e1d15;border-radius:11px;padding:12px;color:var(--green);font-size:12px;line-height:1.5}
+    .specs{display:grid;grid-template-columns:1fr 1fr;gap:7px}.pill{border:1px solid var(--line);background:#151920;border-radius:9px;padding:8px 9px;color:#aeb5bf;font-size:11px}
+    .note{font-size:11px;line-height:1.55;color:var(--muted);margin:10px 0 0}
+    .footer{font-size:10px;line-height:1.5;color:#707985;padding-top:2px}
+    @media(max-width:860px){
+      body{overflow:auto}#app{min-height:100%;height:auto;grid-template-columns:1fr;grid-template-rows:62vh auto}.panel{border-left:0;border-top:1px solid var(--line);padding-bottom:34px}.hint{font-size:11px;left:14px;bottom:12px}.brand{left:14px;top:14px}
+    }
   </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
 <div id="app">
   <section id="stage">
-    <div class="brand"><h1>AURA 3D</h1><p>Door Configurator — proof demo</p></div>
-    <div class="hint">Drag to orbit · Pinch / wheel to zoom</div>
+    <div class="brand">
+      <div class="brandline"><h1>AURA 3D</h1><span class="live">LIVE WEBGL</span></div>
+      <p>Elevator Door Configurator — targeted technical proof</p>
+    </div>
+    <div class="hint">Drag to orbit · Pinch / wheel to zoom · Touch enabled</div>
   </section>
+
   <aside class="panel">
-    <div class="section"><h3>Door operation</h3><div class="material-grid">
-      <button class="mode active" data-mode="center">Automatic — Center Opening</button>
-      <button class="mode" data-mode="telRight">Automatic — Telescopic Right</button>
-      <button class="mode" data-mode="telLeft">Automatic — Telescopic Left</button>
-    </div></div>
-    <div class="section"><h3>Door finish</h3><div class="material-grid">
-      <button class="mat active" data-mat="hairline">Hairline Stainless Steel</button>
-      <button class="mat" data-mat="mirror">Mirror Stainless Steel</button>
-      <button class="mat" data-mat="champagne">Champagne Stainless Steel</button>
-    </div></div>
-    <div class="section"><h3>Animation</h3><div class="row"><button id="openBtn" class="primary">OPEN</button><button id="closeBtn">CLOSE</button></div></div>
-    <div class="section"><h3>View</h3><div class="row"><button id="frontBtn">Front View</button><button id="interiorBtn">Interior View</button></div></div>
-    <div class="section"><h3>Demo scope</h3><div>
-      <span class="pill"><span class="dot"></span>Three.js / WebGL</span><span class="pill"><span class="dot"></span>PBR materials</span><span class="pill"><span class="dot"></span>Real-time animation</span><span class="pill"><span class="dot"></span>Touch-friendly</span>
-    </div><p class="note">Compact Phase‑1 proof: procedural elevator-door geometry, real-time material switching, open/close motion, orbit/zoom, and reusable motion architecture.</p></div>
-    <div class="status" id="status">READY — Center Opening / Hairline Stainless</div>
+    <div class="section">
+      <h3>Door operation</h3>
+      <div class="stack">
+        <button class="mode active" data-mode="center">Automatic — Center Opening</button>
+        <button class="mode" data-mode="telRight">Automatic — Telescopic Right</button>
+        <button class="mode" data-mode="telLeft">Automatic — Telescopic Left</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Door finish</h3>
+      <div class="stack">
+        <button class="mat active" data-mat="hairline">Hairline Stainless Steel</button>
+        <button class="mat" data-mat="mirror">Mirror Stainless Steel</button>
+        <button class="mat" data-mat="champagne">Champagne Stainless Steel</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Motion</h3>
+      <div class="row">
+        <button id="openBtn" class="action primary">OPEN</button>
+        <button id="closeBtn" class="action">CLOSE</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>View</h3>
+      <div class="row">
+        <button id="frontBtn" class="action">FRONT</button>
+        <button id="interiorBtn" class="action">INTERIOR</button>
+      </div>
+      <div class="row" style="margin-top:9px">
+        <button id="rotateBtn" class="action gold">AUTO ROTATE</button>
+        <button id="resetBtn" class="action">RESET</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Proof scope</h3>
+      <div class="specs">
+        <div class="pill">Three.js / WebGL</div><div class="pill">PBR materials</div>
+        <div class="pill">Parametric motion</div><div class="pill">Touch UI</div>
+        <div class="pill">Realtime camera</div><div class="pill">Modular architecture</div>
+      </div>
+      <p class="note">This proof intentionally demonstrates the core Phase‑1 engineering approach. Production AURA CAD/GLB assets, scanned physical material maps and final showroom UI would be integrated after contract start.</p>
+    </div>
+
+    <div class="status" id="status">READY · CENTER OPENING · HAIRLINE STAINLESS</div>
+    <p class="footer">No pre-rendered video. Door geometry, material changes, camera interaction and opening motion are rendered live in the browser.</p>
   </aside>
 </div>
+
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/controls/OrbitControls.js';
-const stage=document.getElementById('stage');
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x0a0b0d);
-const camera=new THREE.PerspectiveCamera(38,1,.1,100);camera.position.set(0,1.2,7.7);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;renderer.shadowMap.enabled=true;stage.appendChild(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,1.25,0);controls.minDistance=4.5;controls.maxDistance=12;controls.maxPolarAngle=Math.PI*.62;controls.minPolarAngle=Math.PI*.30;
-scene.add(new THREE.HemisphereLight(0xe9eef8,0x28231a,1.5));
-const key=new THREE.DirectionalLight(0xffffff,3.2);key.position.set(3.5,6,4.5);key.castShadow=true;scene.add(key);
-const rim=new THREE.DirectionalLight(0xd2b27a,2);rim.position.set(-4,2,-3);scene.add(rim);
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(14,14),new THREE.MeshStandardMaterial({color:0x111317,roughness:.85,metalness:.05}));ground.rotation.x=-Math.PI/2;ground.position.y=-.02;ground.receiveShadow=true;scene.add(ground);
-const backdrop=new THREE.Mesh(new THREE.PlaneGeometry(12,7),new THREE.MeshStandardMaterial({color:0x0f1115,roughness:.92}));backdrop.position.set(0,3,-1.15);scene.add(backdrop);
-const frameMat=new THREE.MeshStandardMaterial({color:0x252a30,metalness:.75,roughness:.32});const wallMat=new THREE.MeshStandardMaterial({color:0x15181d,metalness:.15,roughness:.72});
-function box(w,h,d,mat,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
-box(5.5,.22,.46,frameMat,0,3.92,0);box(.22,3.7,.46,frameMat,-2.64,2,0);box(.22,3.7,.46,frameMat,2.64,2,0);box(6.7,4.3,.35,wallMat,-6,2.15,-.1);box(6.7,4.3,.35,wallMat,6,2.15,-.1);
-const doorGroup=new THREE.Group();scene.add(doorGroup);
-const materials={hairline:new THREE.MeshPhysicalMaterial({color:0xbfc4c9,metalness:1,roughness:.28,clearcoat:.18,clearcoatRoughness:.3}),mirror:new THREE.MeshPhysicalMaterial({color:0xe8edf3,metalness:1,roughness:.055,clearcoat:.85,clearcoatRoughness:.03}),champagne:new THREE.MeshPhysicalMaterial({color:0xc8a768,metalness:1,roughness:.22,clearcoat:.2,clearcoatRoughness:.2})};
-const panelGeo=new THREE.BoxGeometry(1,3.55,.13);let panels=[],mode='center',matName='hairline',progress=0,targetProgress=0;
-function rebuildDoor(){while(doorGroup.children.length)doorGroup.remove(doorGroup.children[0]);panels=[];const mat=materials[matName];if(mode==='center'){for(let i=0;i<2;i++){const p=new THREE.Mesh(panelGeo,mat);p.scale.x=2.46;p.position.set(i===0?-1.23:1.23,2.02,.03);p.castShadow=true;p.userData.closedX=p.position.x;panels.push(p);doorGroup.add(p)}}else{for(let i=0;i<3;i++){const p=new THREE.Mesh(panelGeo,mat);p.scale.x=1.64;p.position.set(-1.64+i*1.64,2.02,.03+i*.008);p.castShadow=true;p.userData.closedX=p.position.x;panels.push(p);doorGroup.add(p)}}applyDoorPose();updateStatus()}
-function applyDoorPose(){const eased=progress*progress*(3-2*progress);if(mode==='center'){const travel=2.05;panels[0].position.x=panels[0].userData.closedX-travel*eased;panels[1].position.x=panels[1].userData.closedX+travel*eased}else if(mode==='telRight'){const base=1.55*eased;panels.forEach((p,i)=>p.position.x=p.userData.closedX+base*(i+1))}else{const base=1.55*eased;panels.forEach((p,i)=>p.position.x=p.userData.closedX-base*(panels.length-i))}}
-function updateStatus(){const ml={center:'Center Opening',telRight:'Telescopic Right',telLeft:'Telescopic Left'}[mode],mt={hairline:'Hairline Stainless',mirror:'Mirror Stainless',champagne:'Champagne Stainless'}[matName],st=targetProgress>.5?'OPENING':'CLOSING';document.getElementById('status').textContent=`${st} / ${ml} / ${mt}`}
-document.querySelectorAll('.mode').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(b=>b.classList.remove('active'));btn.classList.add('active');mode=btn.dataset.mode;progress=0;targetProgress=0;rebuildDoor()}));
-document.querySelectorAll('.mat').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.mat').forEach(b=>b.classList.remove('active'));btn.classList.add('active');matName=btn.dataset.mat;rebuildDoor()}));
-document.getElementById('openBtn').onclick=()=>{targetProgress=1;updateStatus()};document.getElementById('closeBtn').onclick=()=>{targetProgress=0;updateStatus()};
-function setView(pos,target){camera.position.set(...pos);controls.target.set(...target);controls.update()}document.getElementById('frontBtn').onclick=()=>setView([0,1.25,7.7],[0,1.25,0]);document.getElementById('interiorBtn').onclick=()=>setView([0,1.45,-6.2],[0,1.25,0]);
-function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
-let last=performance.now();function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;progress+=(targetProgress-progress)*Math.min(1,dt*3.2);if(Math.abs(targetProgress-progress)<.001)progress=targetProgress;applyDoorPose();controls.update();renderer.render(scene,camera)}rebuildDoor();requestAnimationFrame(animate);
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const stage = document.getElementById('stage');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x090b0e);
+scene.fog = new THREE.Fog(0x090b0e, 11, 24);
+
+const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+camera.position.set(0, 1.75, 8.1);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.appendChild(renderer.domElement);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+const envRT = pmrem.fromScene(new RoomEnvironment(renderer), 0.04);
+scene.environment = envRT.texture;
+pmrem.dispose();
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.055;
+controls.target.set(0, 1.8, 0);
+controls.minDistance = 4.4;
+controls.maxDistance = 12;
+controls.maxPolarAngle = Math.PI * 0.63;
+controls.minPolarAngle = Math.PI * 0.27;
+
+scene.add(new THREE.HemisphereLight(0xdfe7f2, 0x241f18, 1.45));
+const key = new THREE.DirectionalLight(0xffffff, 3.4); key.position.set(4, 7, 5); key.castShadow = true; scene.add(key);
+const warm = new THREE.DirectionalLight(0xe1b970, 1.9); warm.position.set(-4, 2.8, 2.5); scene.add(warm);
+const rear = new THREE.DirectionalLight(0x9fc4ff, 1.0); rear.position.set(0, 4, -5); scene.add(rear);
+
+function meshBox(w,h,d,mat,x,y,z,parent=scene){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  m.position.set(x,y,z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+
+const wallMat = new THREE.MeshStandardMaterial({ color:0x15191f, roughness:.72, metalness:.08 });
+const frameMat = new THREE.MeshStandardMaterial({ color:0x3a4048, roughness:.28, metalness:.88 });
+const trimMat = new THREE.MeshStandardMaterial({ color:0x858c93, roughness:.19, metalness:1 });
+const cabinMat = new THREE.MeshStandardMaterial({ color:0x22272d, roughness:.47, metalness:.45 });
+
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(22,16), new THREE.MeshStandardMaterial({color:0x111419,roughness:.72,metalness:.16}));
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+
+// Architectural surround and shallow cabin give the proof a believable elevator context.
+meshBox(4.9,4.45,.26,wallMat,-5.05,2.22,-.14);
+meshBox(4.9,4.45,.26,wallMat, 5.05,2.22,-.14);
+meshBox(5.35,.27,.52,frameMat,0,4.18,0);
+meshBox(.27,4.05,.52,frameMat,-2.67,2.15,0);
+meshBox(.27,4.05,.52,frameMat, 2.67,2.15,0);
+meshBox(5.05,.05,.08,trimMat,0,.13,.18);
+meshBox(5.1,3.9,.12,cabinMat,0,2.05,-2.1);
+meshBox(.12,3.9,4.0,cabinMat,-2.5,2.05,-.15);
+meshBox(.12,3.9,4.0,cabinMat, 2.5,2.05,-.15);
+meshBox(5.0,.12,4.0,cabinMat,0,4.0,-.15);
+
+// Soft ceiling panel.
+const ceilingLight = meshBox(2.8,.035,.65,new THREE.MeshStandardMaterial({color:0xf4e8c7,emissive:0xd3b675,emissiveIntensity:1.1,roughness:.5}),0,3.91,-1.15);
+ceilingLight.castShadow = false;
+
+const doorGroup = new THREE.Group(); scene.add(doorGroup);
+
+const hairline = new THREE.MeshPhysicalMaterial({
+  color:0xc7cbd0, metalness:1, roughness:.24, clearcoat:.12, clearcoatRoughness:.22,
+  anisotropy:.92, anisotropyRotation:0
+});
+const mirror = new THREE.MeshPhysicalMaterial({
+  color:0xe8ecf0, metalness:1, roughness:.055, clearcoat:.92, clearcoatRoughness:.025
+});
+const champagne = new THREE.MeshPhysicalMaterial({
+  color:0xc8a364, metalness:1, roughness:.2, clearcoat:.18, clearcoatRoughness:.15,
+  anisotropy:.55
+});
+const finishes = { hairline, mirror, champagne };
+
+let mode='center', finish='hairline', progress=0, target=0, panels=[], autoRotate=false;
+
+function makePanel(width, x, z, targetX){
+  const p = new THREE.Mesh(new THREE.BoxGeometry(width,3.72,.12), finishes[finish]);
+  p.position.set(x,2.12,z); p.castShadow = true; p.receiveShadow = true;
+  p.userData.closedX = x; p.userData.openX = targetX;
+  // subtle center seam / edge catches light as the panels move
+  const edge = new THREE.Mesh(new THREE.BoxGeometry(.025,3.66,.135), trimMat);
+  edge.position.x = width/2 - .02; p.add(edge);
+  doorGroup.add(p); panels.push(p);
+}
+
+function rebuildDoor(){
+  while(doorGroup.children.length) doorGroup.remove(doorGroup.children[0]);
+  panels=[]; progress=0; target=0;
+  if(mode==='center'){
+    makePanel(2.42,-1.21,.04,-3.55);
+    makePanel(2.42, 1.21,.045,3.55);
+  } else if(mode==='telRight'){
+    makePanel(1.61,-1.61,.035,2.78);
+    makePanel(1.61, 0.00,.055,2.92);
+    makePanel(1.61, 1.61,.075,3.06);
+  } else {
+    makePanel(1.61,-1.61,.075,-3.06);
+    makePanel(1.61, 0.00,.055,-2.92);
+    makePanel(1.61, 1.61,.035,-2.78);
+  }
+  applyPose(); updateStatus('READY');
+}
+
+function smoothstep(t){ return t*t*(3-2*t); }
+function applyPose(){
+  const t=smoothstep(progress);
+  panels.forEach(p=>{ p.position.x = THREE.MathUtils.lerp(p.userData.closedX,p.userData.openX,t); });
+}
+
+function labels(){
+  return {
+    mode:{center:'CENTER OPENING',telRight:'TELESCOPIC RIGHT',telLeft:'TELESCOPIC LEFT'}[mode],
+    finish:{hairline:'HAIRLINE STAINLESS',mirror:'MIRROR STAINLESS',champagne:'CHAMPAGNE STAINLESS'}[finish]
+  };
+}
+function updateStatus(state){ const l=labels(); document.getElementById('status').textContent=`${state} · ${l.mode} · ${l.finish}`; }
+
+function setActive(selector, el){ document.querySelectorAll(selector).forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
+document.querySelectorAll('.mode').forEach(btn=>btn.addEventListener('click',()=>{ setActive('.mode',btn); mode=btn.dataset.mode; rebuildDoor(); }));
+document.querySelectorAll('.mat').forEach(btn=>btn.addEventListener('click',()=>{ setActive('.mat',btn); finish=btn.dataset.mat; rebuildDoor(); }));
+
+document.getElementById('openBtn').onclick=()=>{ target=1; updateStatus('OPENING'); };
+document.getElementById('closeBtn').onclick=()=>{ target=0; updateStatus('CLOSING'); };
+
+document.getElementById('frontBtn').onclick=()=>{ camera.position.set(0,1.75,8.1); controls.target.set(0,1.8,0); controls.update(); };
+document.getElementById('interiorBtn').onclick=()=>{ camera.position.set(0,1.8,-6.5); controls.target.set(0,1.8,0); controls.update(); };
+document.getElementById('resetBtn').onclick=()=>{ autoRotate=false; controls.autoRotate=false; camera.position.set(0,1.75,8.1); controls.target.set(0,1.8,0); controls.update(); target=0; updateStatus('RESET'); };
+document.getElementById('rotateBtn').onclick=(e)=>{ autoRotate=!autoRotate; controls.autoRotate=autoRotate; controls.autoRotateSpeed=.85; e.currentTarget.classList.toggle('active',autoRotate); updateStatus(autoRotate?'ROTATING':'READY'); };
+
+function resize(){ const w=stage.clientWidth,h=stage.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+addEventListener('resize',resize); resize(); rebuildDoor();
+
+let last=performance.now();
+function animate(now){
+  requestAnimationFrame(animate);
+  const dt=Math.min((now-last)/1000,.05); last=now;
+  const speed=3.1;
+  if(Math.abs(target-progress)>.0007){
+    progress += (target-progress)*Math.min(1,dt*speed);
+    if(Math.abs(target-progress)<.001){ progress=target; updateStatus(target>0?'OPEN':'CLOSED'); }
+  }
+  applyPose(); controls.update(); renderer.render(scene,camera);
+}
+requestAnimationFrame(animate);
 </script>
 </body>
 </html>
