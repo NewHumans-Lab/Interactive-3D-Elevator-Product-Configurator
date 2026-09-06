@@ -1,36 +1,34 @@
 # Interactive 3D Elevator Product Configurator
 
-A compact proof-of-capability prepared for the AURA Elevators Phase 1 door configurator scope.
+Targeted technical proof prepared for the AURA Elevators Phase 1 door-configurator scope.
 
-## Phase 1 requirements distilled from the job
-- Web-based real-time 3D, not pre-rendered video
-- Automatic center opening
-- Automatic telescopic right
-- Automatic telescopic left
-- Hairline / Mirror / Champagne stainless finishes
-- OPEN / CLOSE controls
-- Orbit / rotate and zoom
-- Front / interior view
-- Touch-friendly controls
-- Reusable architecture so the Door Configurator can later become a module inside the Complete Elevator Configurator
-- High visual quality without sacrificing real-time performance
+## Live demo
 
-## What this compact proof demonstrates
-- Procedural elevator-door geometry
-- Parameterized real-time door motion
-- PBR-style metallic material switching
-- Camera orbit / zoom
-- Front and interior views
-- Responsive touchscreen-oriented UI
-- Three.js/WebGL implementation
+https://newhumans-lab.github.io/Interactive-3D-Elevator-Product-Configurator/
 
-## Deliberately omitted from the proof
-- Final AURA CAD/GLB models
-- Real scanned PBR maps from physical material samples
-- Semi-automatic hinged-door variants
-- Final showroom branding/UI
-- CRM, quotation, QR and PDF integrations
-- Final production hardware tuning
+## What this proof demonstrates
+- Browser-rendered real-time Three.js / WebGL scene
+- Automatic center-opening elevator doors
+- Automatic telescopic-right doors
+- Automatic telescopic-left doors
+- Hairline, mirror and champagne stainless finishes
+- Parameterized OPEN / CLOSE motion rather than pre-rendered video
+- Front and interior camera views
+- Orbit, zoom and auto-rotate interaction
+- Touch-oriented responsive UI
+- Modular motion/material structure that can grow into the complete elevator configurator
 
-## Bid positioning
-This repository is a targeted technical proof prepared after reading the AURA requirements. It is not presented as a previously completed client configurator.
+## Production Phase 1 scope this is designed to lead into
+- Final AURA CAD / GLB assets
+- Physical-sample-based PBR material capture and calibration
+- Semi-automatic left/right door variants
+- Final showroom UI for 43–55 inch touchscreens
+- Asset optimization and hardware profiling
+- Source code, editable 3D assets, textures and technical documentation
+- Architecture ready for later CRM / quotation / configuration-ID integrations
+
+## Important positioning
+This is a purpose-built proof prepared after reading the project requirements. It is not presented as a previously completed client configurator.
+
+## Deployment
+The repository includes a GitHub Actions Pages workflow. Every push to `main` redeploys the static demo automatically.
